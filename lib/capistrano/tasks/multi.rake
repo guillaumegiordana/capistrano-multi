@@ -95,7 +95,7 @@ namespace :deploy do
     end
   end
 
-  before 'deploy:set_project', 'deploy:set_server_group'
+  after 'deploy:set_project', 'deploy:set_server_group'
   before 'deploy:starting', 'deploy:set_project'
   before 'deploy:symlink:release', 'deploy:copy_files'
 

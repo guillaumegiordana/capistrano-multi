@@ -59,16 +59,26 @@ namespace :deploy do
   task :copy_files do
     current_project = fetch(:project).to_s
 
-    on roles(:all) do
-      within "#{release_path}/#{fetch(:config_dir)}/#{fetch(:stage)}/#{current_project}" do
-        set :linked_files, []
-        files = capture :find, '.', '-type', 'f', '|', 'cut', '-b', '3-'
+    paths = Array.new
+    paths.push(File.path("#{release_path}/#{fetch(:config_dir)}/#{fetch(:stage)}/#{fetch(:projects_dir)}/#{current_project}"))
 
-        files = files.split("\n")
-        files.each do |file|
-          file = Pathname.new file
-          execute :mkdir, '-p', release_path.join(file.dirname)
-          execute :mv, file, release_path.join(file.dirname)
+    if fetch(:use_global_config)
+      paths.push(File.path("#{release_path}/#{fetch(:config_dir)}/#{fetch(:stage)}/#{fetch(:global_config_dir)}"))
+    end
+
+    on roles(:all) do
+
+      paths.each do |path|
+        within path do
+          set :linked_files, []
+          files = capture :find, '.', '-type', 'f', '|', 'cut', '-b', '3-'
+
+          files = files.split("\n")
+          files.each do |file|
+            file = Pathname.new file
+            execute :mkdir, '-p', release_path.join(file.dirname)
+            execute :mv, file, release_path.join(file.dirname)
+          end
         end
       end
 
@@ -107,5 +117,8 @@ namespace :load do
   task :defaults do
     set :use_custom_deploy_to, true
     set :config_dir, 'config'
+    set :use_global_config, false
+    set :projects_dir, ''
+    set :global_config_dir, 'global'
   end
 end

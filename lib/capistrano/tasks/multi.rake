@@ -46,7 +46,8 @@ namespace :deploy do
       set :project, found_projects[fetch(:project_num).to_i]
 
       if fetch(:use_custom_deploy_to) && fetch(:deploy_to)
-        set :deploy_to, "#{fetch(:deploy_to).to_s}/#{fetch(:project).to_s}/#{fetch(:application)}"
+        app_folder = fetch(:application).tr('-', '/')
+        set :deploy_to, "#{fetch(:deploy_to).to_s}/#{fetch(:project).to_s}/#{app_folder}"
       end
 
     end
@@ -97,7 +98,7 @@ namespace :deploy do
 
   after 'deploy:set_project', 'deploy:set_server_group'
   before 'deploy:starting', 'deploy:set_project'
-  before 'deploy:symlink:release', 'deploy:copy_files'
+  after 'deploy:symlink:shared', 'deploy:copy_files'
 
 
 end

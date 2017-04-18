@@ -60,7 +60,9 @@ namespace :deploy do
     current_project = fetch(:project).to_s
 
     paths = Array.new
-    paths.push(File.path("#{release_path}/#{fetch(:config_dir)}/#{fetch(:stage)}/#{fetch(:projects_dir)}/#{current_project}"))
+    if current_project
+      paths.push(File.path("#{release_path}/#{fetch(:config_dir)}/#{fetch(:stage)}/#{fetch(:projects_dir)}/#{current_project}"))
+    end
 
     if fetch(:use_global_config)
       paths.push(File.path("#{release_path}/#{fetch(:config_dir)}/#{fetch(:stage)}/#{fetch(:global_config_dir)}"))

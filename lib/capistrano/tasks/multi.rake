@@ -8,7 +8,7 @@ namespace :deploy do
   desc 'Choose project to deploy'
   task :set_project do
 
-    if fetch(:project).nil?
+    if fetch(:project).nil? && fetch(:projects)
 
       found_projects = {}
       nb_project = 1

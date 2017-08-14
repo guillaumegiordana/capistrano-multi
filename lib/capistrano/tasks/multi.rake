@@ -10,40 +10,31 @@ namespace :deploy do
 
     if fetch(:project).nil? && fetch(:projects)
 
-      found_projects = {}
-      nb_project = 1
-
       # We get all the multi in the directory
       projects = fetch(:projects).sort.to_h
 
-      # For each projets, we set the needed configuration
-      projects.each do |current_project|
-        found_projects[nb_project] = current_project[0].to_s
-        nb_project += 1
-      end
-
       # If project parameter is set, we don't need to ask for it
-      if ENV['project']
-        set :project_num, ENV['project']
+      if ENV['project'] && !ENV['project'].nil? && projects.key?(ENV['project'].to_sym)
+        set :project_name, ENV['project']
       else
 
-        puts '================================='
-        puts '| N° | PROJECT'
-        puts '================================='
-        found_projects.each do |number, project|
-          puts '| %.2i' %number.to_s+" | #{project.to_s}"
+        puts '====================='
+        puts 'PROJECT'
+        puts '====================='
+        projects.each do |project|
+          puts project[0].to_s
         end
 
         begin
-          ask(:project_num, 'number')
-          fetch(:project_num)
-        end while !Integer(fetch(:project_num)) ||
-          Integer(fetch(:project_num)) <= 0 ||
-          Integer(fetch(:project_num)) > projects.length
+          ask(:project_name, nil)
+          fetch(:project_name)
+
+        end while fetch(:project_name).nil? ||
+          !projects.key?(fetch(:project_name).to_sym)
 
       end
 
-      set :project, found_projects[fetch(:project_num).to_i]
+      set :project, fetch(:project_name)
 
       if fetch(:use_custom_deploy_to) && fetch(:deploy_to)
         app_folder = fetch(:application).tr('-', '/')
